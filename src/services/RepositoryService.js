@@ -1,25 +1,39 @@
 const { DocumentRepository } = require("../repositories/DocumentRepository");
+const { DocumentFactory } = require("../factories/DocumentFactory");
+const { TextLoader } = require("../loaders/TextLoader");
 
 class RepositoryService {
+
     constructor() {
         this.repository = new DocumentRepository();
+        this.factory = new DocumentFactory();
+        this.loader = new TextLoader();
     }
 
-    addDocument(document) {
+    load(filePath) {
+
+        const file = this.loader.load(filePath);
+
+        const document = this.factory.create(file);
+
         this.repository.add(document);
+
+        return document;
+
     }
 
-    getDocuments() {
+    list() {
         return this.repository.list();
     }
 
-    getDocumentById(id) {
+    getById(id) {
         return this.repository.getById(id);
     }
 
-    countDocuments() {
+    count() {
         return this.repository.count();
     }
+
 }
 
 module.exports = { RepositoryService };
