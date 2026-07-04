@@ -1,39 +1,48 @@
+const fs = require("fs");
+const path = require("path");
+
 const { DocumentRepository } = require("../repositories/DocumentRepository");
 const { DocumentFactory } = require("../factories/DocumentFactory");
 const { TextLoader } = require("../loaders/TextLoader");
 
 class RepositoryService {
+  constructor() {
+    this.repository = new DocumentRepository();
+    this.factory = new DocumentFactory();
+    this.loader = new TextLoader();
+  }
 
-    constructor() {
-        this.repository = new DocumentRepository();
-        this.factory = new DocumentFactory();
-        this.loader = new TextLoader();
-    }
+  load(filePath) {
+    const file = this.loader.load(filePath);
+    const document = this.factory.create(file);
+    this.repository.add(document);
+    return document;
+  }
 
-    load(filePath) {
+  loadDirectory(directoryPath) {
+    const absoluteDir = path.resolve(directoryPath);
 
-        const file = this.loader.load(filePath);
+    const files = fs
+      .readdirSync(absoluteDir)
+      .filter(file => file.toLowerCase().endsWith(".txt"));
 
-        const document = this.factory.create(file);
+    return files.map(file => {
+      const filePath = path.join(absoluteDir, file);
+      return this.load(filePath);
+    });
+  }
 
-        this.repository.add(document);
+  list() {
+    return this.repository.list();
+  }
 
-        return document;
+  getById(id) {
+    return this.repository.getById(id);
+  }
 
-    }
-
-    list() {
-        return this.repository.list();
-    }
-
-    getById(id) {
-        return this.repository.getById(id);
-    }
-
-    count() {
-        return this.repository.count();
-    }
-
+  count() {
+    return this.repository.count();
+  }
 }
 
 module.exports = { RepositoryService };
