@@ -4,12 +4,14 @@ const path = require("path");
 const { DocumentRepository } = require("../repositories/DocumentRepository");
 const { DocumentFactory } = require("../factories/DocumentFactory");
 const { TextLoader } = require("../loaders/TextLoader");
+const { KnowledgeScanner } = require("../scanners/KnowledgeScanner");
 
 class RepositoryService {
   constructor() {
     this.repository = new DocumentRepository();
     this.factory = new DocumentFactory();
     this.loader = new TextLoader();
+    this.scanner = new KnowledgeScanner();
   }
 
   load(filePath) {
@@ -30,6 +32,12 @@ class RepositoryService {
       const filePath = path.join(absoluteDir, file);
       return this.load(filePath);
     });
+  }
+
+  loadKnowledgeBase(directoryPath) {
+    const files = this.scanner.scan(directoryPath);
+
+    return files.map(filePath => this.load(filePath));
   }
 
   list() {
