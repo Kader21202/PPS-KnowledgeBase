@@ -1,0 +1,20 @@
+# Node.js
+node_modules/
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.*
+
+# Coverage
+coverage/
+
+# IDE
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
