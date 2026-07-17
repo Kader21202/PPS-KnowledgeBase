@@ -8,7 +8,7 @@ class KnowledgeRetriever {
   }
 
   retrieve(query, options = {}) {
-    const limit = options.limit || 5;
+    const limit = options.limit || 30;
 
     return this.index.search(query).slice(0, limit);
   }
