@@ -22,13 +22,19 @@ class SourceParser {
   }
 
   extractValue(block, label) {
-    const lines = block.split(/\r?\n/).map(line => line.trim());
-    const index = lines.findIndex(line => line === `${label} :`);
+  const lines = block.split(/\r?\n/).map(line => line.trim());
+  const index = lines.findIndex(line => line === `${label} :`);
 
-    if (index === -1) return null;
+  if (index === -1) return null;
 
-    return lines[index + 1] || null;
+  for (let i = index + 1; i < lines.length; i++) {
+    if (lines[i]) {
+      return lines[i];
+    }
   }
+
+  return null;
+}
 }
 
 module.exports = { SourceParser };

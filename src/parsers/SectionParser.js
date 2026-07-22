@@ -10,6 +10,18 @@ class SectionParser {
     for (const line of lines) {
       const trimmed = line.trim();
 
+      if (
+        trimmed === "METADONNEES DOCUMENT" ||
+        trimmed === "SOURCES ET REFERENCES"
+      ) {
+        if (current) {
+          sections.push(current);
+          current = null;
+        }
+
+        break;
+      }
+
       if (/^\d+\.\s+/.test(trimmed)) {
         if (current) sections.push(current);
 

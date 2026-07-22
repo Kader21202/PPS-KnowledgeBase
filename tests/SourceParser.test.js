@@ -12,8 +12,21 @@ const sources = parser.parse(file.content);
 
 console.log(sources);
 
-if (!sources.length || !sources[0].title) {
-  throw new Error("Source non détectée.");
+if (sources.length !== 1) {
+  throw new Error("Une seule source est attendue.");
 }
+
+const source = sources[0];
+
+if (!source.title) {
+  throw new Error("Titre de la source non détecté.");
+}
+
+if (!source.url) {
+  throw new Error("URL_SOURCE non détectée.");
+}
+
+console.log("Titre :", source.title);
+console.log("URL :", source.url);
 
 console.log("✅ SourceParser test passed");
