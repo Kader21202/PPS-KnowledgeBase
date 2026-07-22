@@ -35,6 +35,7 @@ const { KnowledgeGraphBuilder } = require("./graph/KnowledgeGraphBuilder");
 const { Evidence } = require("./evidence/Evidence");
 const { EvidenceBuilder } = require("./evidence/EvidenceBuilder");
 const { KnowledgePackageBuilder } = require("./builders/KnowledgePackageBuilder");
+const { KnowledgeBaseBuilder } = require("./builders/KnowledgeBaseBuilder");
 const { KnowledgeRanker } = require("./ranking/KnowledgeRanker");
 module.exports = {
   Document,
@@ -67,8 +68,9 @@ module.exports = {
   KnowledgeGraph,
   KnowledgeGraphBuilder,
 
-  Evidence,
+   Evidence,
   EvidenceBuilder,
   KnowledgeRanker,
-  KnowledgePackageBuilder
+  KnowledgePackageBuilder,
+  KnowledgeBaseBuilder
 };
