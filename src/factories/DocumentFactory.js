@@ -1,4 +1,5 @@
 const pathModule = require("path");
+const crypto = require("crypto");
 const { Document } = require("../contracts/Document");
 const { DocumentParser } = require("../parsers/DocumentParser");
 
@@ -8,16 +9,32 @@ class DocumentFactory {
   }
 
   create(file) {
-    const filePath = file.path;
+    const filePath = pathModule.resolve(file.path);
     const content = file.content;
 
     const fileName = pathModule.basename(filePath);
-    const fallbackTitle = fileName.replace(pathModule.extname(fileName), "");
+    const fallbackTitle = fileName.replace(
+      pathModule.extname(fileName),
+      ""
+    );
+
+    const normalizedPath = filePath
+      .replace(/\\/g, "/")
+      .toLowerCase();
+
+    const pathFingerprint = crypto
+      .createHash("sha256")
+      .update(normalizedPath)
+      .digest("hex")
+      .slice(0, 12);
+
+    const documentId =
+      `${fallbackTitle}-${pathFingerprint}`;
 
     const parsed = this.parser.parse(content);
 
     return new Document({
-      id: fallbackTitle,
+      id: documentId,
       title: parsed.title || fallbackTitle,
       category: parsed.metadata.category || "unknown",
       type: parsed.metadata.type || "text",

@@ -28,29 +28,98 @@ class KnowledgePackageBuilder {
       question || ""
     ).toLowerCase();
 
-    const strategy =
-      options.strategy ||
-      (
-        normalizedQuestion.startsWith("qui est") ||
-        normalizedQuestion.startsWith("qui était") ||
-        normalizedQuestion.includes("biographie")
-          ? "biography"
-          : "definition"
-      );
+    const isBiography =
+  normalizedQuestion.startsWith("qui est") ||
+  normalizedQuestion.startsWith("qui était") ||
+  normalizedQuestion.includes("biographie");
+
+const isHistory =
+  normalizedQuestion.includes("histoire") ||
+  normalizedQuestion.includes("historique") ||
+  normalizedQuestion.includes("origine") ||
+  normalizedQuestion.includes("naissance") ||
+  normalizedQuestion.includes("création") ||
+  normalizedQuestion.includes("creation") ||
+  normalizedQuestion.includes("évolution") ||
+  normalizedQuestion.includes("evolution") ||
+  normalizedQuestion.includes("parcours") ||
+  normalizedQuestion.includes("chronologie");
+
+const strategy =
+  options.strategy ||
+  (
+    isBiography
+      ? "biography"
+      : isHistory
+        ? "history"
+        : "definition"
+  );
 
     const candidateFragments =
       this.retriever.retrieve(question, {
         limit: candidateLimit
       });
 
-    const rankedFragments = this.ranker
-      .rank({
-        question,
-        fragments: candidateFragments,
-        strategy
-      })
-      .slice(0, limit);
+    const rankedCandidates = this.ranker
+  .rank({
+    question,
+    fragments: candidateFragments,
+    strategy
+  });
 
+const bestScore = Number(
+  rankedCandidates[0]?.ranking?.finalScore ?? 0
+);
+
+const relativeRelevanceThreshold =
+  options.relativeRelevanceThreshold ?? 0.5;
+
+const coveredTerms = new Set();
+
+const rankedFragments = [];
+
+for (const fragment of rankedCandidates) {
+  if (rankedFragments.length >= limit) {
+    break;
+  }
+
+  const finalScore = Number(
+    fragment.ranking?.finalScore ?? 0
+  );
+
+  const relativeScore =
+    bestScore > 0
+      ? finalScore / bestScore
+      : 0;
+
+  const matchedTerms = [
+    ...new Set(
+      fragment.retrievalMatchedTerms || []
+    )
+  ];
+
+  const newTerms = matchedTerms.filter(
+    term => !coveredTerms.has(term)
+  );
+
+  const sufficientlyRelevant =
+    relativeScore >=
+    relativeRelevanceThreshold;
+
+  const contributesNewCoverage =
+    newTerms.length > 0;
+
+  if (
+    sufficientlyRelevant ||
+    contributesNewCoverage
+  ) {
+    rankedFragments.push(fragment);
+
+    for (const term of matchedTerms) {
+      coveredTerms.add(term);
+    }
+  }
+}
     return {
       question,
 
